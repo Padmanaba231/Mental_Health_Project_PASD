@@ -1,11 +1,11 @@
 import streamlit as st
 import requests
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 # Konfigurasi API Gemini
 API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent"
-load_dotenv()  # ini akan membaca file .env
+# load_dotenv()  # ini akan membaca file .env
 
 API_KEY = os.getenv("API_KEY")
 

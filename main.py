@@ -10,5 +10,5 @@ page = st.sidebar.radio("Pilih halaman", ["Home", "Chatbot BISINDO"])
 if page == "Home":
     # homepage()
     pass
-elif page == "Chatbot BISINDO":
+elif page == "Chatbot":
     chatbot_mental()

@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import pickle
+import sklearn
 
 # --- Load Model Secara Efisien menggunakan cache_resource ---
 @st.cache_resource

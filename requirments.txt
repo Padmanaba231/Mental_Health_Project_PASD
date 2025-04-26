@@ -3,5 +3,6 @@ requests
 python-dotenv
 google-generativeai
 dotenv
+scikit-learn
 pandas
-sklearn
+numpy

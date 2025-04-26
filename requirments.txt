@@ -3,3 +3,5 @@ requests
 python-dotenv
 google-generativeai
 dotenv
+pandas
+sklearn

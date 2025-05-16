@@ -1,12 +1,11 @@
 import streamlit as st
 import pandas as pd
 import pickle
-import sklearn
 
 # --- Load Model Secara Efisien menggunakan cache_resource ---
 @st.cache_resource
 def load_model():
-    with open('mental_health_model.pkl', 'rb') as file:
+    with open('model.pkl', 'rb') as file:
         model = pickle.load(file)
     return model
 
@@ -15,7 +14,7 @@ model = load_model()
 
 def screening():
     # Antarmuka pengguna Streamlit
-    st.title("Screening Penyakit")
+    st.title("Screening Penyakit Mental")
 
     st.write("""
     Silakan jawab pertanyaan-pertanyaan di bawah ini:
@@ -72,7 +71,71 @@ def screening():
     # Tombol Prediksi
     if st.button("Prediksi"):
         hasil = prediksi(user_input)
-        st.success(f"Hasil Prediksi: **{hasil}**")
+        
+        # Format hasil prediksi yang lebih informatif dengan styling yang bekerja di dark mode
+        if hasil.lower() == "other":
+            st.markdown("""
+            <style>
+                .custom-result {
+                    background-color: rgba(38, 39, 48, 0.8);
+                    border-radius: 0.5rem;
+                    padding: 1rem;
+                    margin: 1rem 0;
+                    border-left: 4px solid #9AD8E1;
+                }
+                .custom-result h3 {
+                    color: #9AD8E1;
+                    margin-top: 0;
+                }
+                .custom-result ul {
+                    margin-bottom: 0.5rem;
+                }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            hasil_display = f"""
+            <div class="custom-result">
+                <h3>🟢 Hasil Screening</h3>
+                <p>Berdasarkan jawaban Anda:</p>
+                <p><b>Anda tidak terdeteksi mengalami gangguan kesehatan mental berikut:</b></p>
+                <ul>
+                    <li>Eating disorder</li>
+                    <li>Marijuana abuse</li>
+                    <li>Panic disorder</li>
+                    <li>Postpartum depression</li>
+                    <li>Substance-related mental disorder</li>
+                </ul>
+                <p><i>Catatan:</i> Aplikasi ini memiliki keterbatasan dalam mendeteksi berbagai jenis penyakit. 
+                Jika Anda masih merasa tidak sehat, kami sarankan untuk berkonsultasi dengan tenaga kesehatan profesional.</p>
+            </div>
+            """
+        else:
+            st.markdown("""
+            <style>
+                .custom-result {
+                    background-color: rgba(38, 39, 48, 0.8);
+                    border-radius: 0.5rem;
+                    padding: 1rem;
+                    margin: 1rem 0;
+                    border-left: 4px solid #FF4B4B;
+                }
+                .custom-result h3 {
+                    color: #FF4B4B;
+                    margin-top: 0;
+                }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            hasil_display = f"""
+            <div class="custom-result">
+                <h3>🔴 Hasil Screening</h3>
+                <p>Berdasarkan jawaban Anda:</p>
+                <p><b>Kemungkinan Anda mengalami: {hasil}</b></p>
+                <p>Hasil ini merupakan prediksi awal. Untuk diagnosis yang akurat, silakan konsultasikan dengan tenaga kesehatan profesional.</p>
+            </div>
+            """
+        
+        st.markdown(hasil_display, unsafe_allow_html=True)
 
     # Footer
     st.markdown("""

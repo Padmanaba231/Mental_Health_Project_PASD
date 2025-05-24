@@ -85,6 +85,13 @@ def create_pdf(hasil, answers, questions):
     
     return pdf
 
+def get_pdf_download_link(pdf):
+    """Fungsi khusus untuk deployment Streamlit"""
+    buffer = io.BytesIO()
+    pdf.output(buffer)
+    buffer.seek(0)
+    return buffer
+
 def screening():
     # Antarmuka pengguna Streamlit
     st.title("Screening Penyakit Mental")
@@ -175,19 +182,19 @@ def screening():
         # Buat PDF
         pdf = create_pdf(hasil, user_input, questions)
 
-        pdf_bytes = io.BytesIO()
-        pdf.output(pdf_bytes)
-        pdf_bytes.seek(0)
-        
+        # Versi deployment-safe
+        pdf_bytes = get_pdf_download_link(pdf)
+
         # Tampilkan tombol download menggunakan st.download_button
         st.markdown("### Download Hasil Screening")
         
         # Tombol download
         st.download_button(
-            "📥 Download Hasil Screening (PDF)",
+            label="⬇️ Download Hasil Lengkap (PDF)",
             data=pdf_bytes,
             file_name=f"Hasil_Screening_{datetime.now().strftime('%Y%m%d')}.pdf",
-            mime="application/pdf"
+            mime="application/octet-stream",  # Lebih universal daripada application/pdf
+            key="pdf_download"  # Key unik untuk komponen
         )
 
     # Footer

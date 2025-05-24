@@ -4,6 +4,7 @@ import pickle
 from fpdf import FPDF
 import base64
 from datetime import datetime
+from io import BytesIO
 
 # --- Load Model Secara Efisien menggunakan cache_resource ---
 @st.cache_resource
@@ -87,15 +88,11 @@ def create_pdf(hasil, answers, questions):
 
 # Fungsi untuk generate link download PDF
 def get_pdf_download_link(pdf, filename):
-    # Generate PDF output
-    import io
-    buffer = io.BytesIO()
+    buffer = BytesIO()
     pdf.output(buffer)
-    pdf_output = buffer.getvalue()
-
-    # Convert to base64
-    b64 = base64.b64encode(pdf_output).decode('latin-1')
-    return f'<a href="data:application/pdf;base64,{b64}" download="{filename}">Download Hasil Screening (PDF)</a>'
+    buffer.seek(0)
+    b64 = base64.b64encode(buffer.read()).decode()
+    return f'<a href="data:application/octet-stream;base64,{b64}" download="{filename}">Download PDF</a>'
 
 def screening():
     # Antarmuka pengguna Streamlit

@@ -6,3 +6,4 @@ dotenv
 scikit-learn
 pandas
 numpy
+fpdf

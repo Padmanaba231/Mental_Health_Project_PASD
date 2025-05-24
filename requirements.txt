@@ -6,5 +6,5 @@ dotenv
 scikit-learn
 pandas
 numpy
-fpdf
-pickle
+fpdf2
+pickle-mixin

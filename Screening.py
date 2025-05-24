@@ -87,12 +87,22 @@ def create_pdf(hasil, answers, questions):
     return pdf
 
 # Fungsi untuk generate link download PDF
-def get_pdf_download_link(pdf, filename):
-    buffer = BytesIO()
-    pdf.output(buffer)
-    buffer.seek(0)
-    b64 = base64.b64encode(buffer.read()).decode()
-    return f'<a href="data:application/octet-stream;base64,{b64}" download="{filename}">Download PDF</a>'
+def get_pdf_download_link():
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.cell(200, 10, txt="Hello World", ln=True)
+
+    pdf_output = BytesIO()
+    pdf.output(pdf_output)
+    pdf_output.seek(0)
+
+    st.download_button(
+        label="Download PDF",
+        data=pdf_output,
+        file_name="report.pdf",
+        mime="application/pdf"
+    )
 
 def screening():
     # Antarmuka pengguna Streamlit

@@ -93,6 +93,10 @@ def get_pdf_download_link(pdf, filename):
     pdf.output(buffer)
     pdf_output = buffer.getvalue()
 
+    # Convert to base64
+    b64 = base64.b64encode(pdf_output).decode('latin-1')
+    return f'<a href="data:application/pdf;base64,{b64}" download="{filename}">Download Hasil Screening (PDF)</a>'
+
 def screening():
     # Antarmuka pengguna Streamlit
     st.title("Screening Penyakit Mental")

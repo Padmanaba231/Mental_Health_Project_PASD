@@ -3,7 +3,8 @@ import pandas as pd
 import pickle
 from fpdf import FPDF
 from datetime import datetime
-import io
+import tempfile
+import os
 
 # --- Load Model Secara Efisien menggunakan cache_resource ---
 @st.cache_resource
@@ -84,13 +85,6 @@ def create_pdf(hasil, answers, questions):
     pdf.cell(0, 10, f"Dicetak pada: {datetime.now().strftime('%d/%m/%Y %H:%M')}", 0, 0, 'C')
     
     return pdf
-
-def get_pdf_download_link(pdf):
-    """Fungsi khusus untuk deployment Streamlit"""
-    buffer = io.BytesIO()
-    pdf.output(buffer)
-    buffer.seek(0)
-    return buffer
 
 def screening():
     # Antarmuka pengguna Streamlit
@@ -179,24 +173,20 @@ def screening():
         
         st.markdown(hasil_display, unsafe_allow_html=True)
         
-        # Buat PDF
-        pdf = create_pdf(hasil, user_input, questions)
-
-        pdf_bytes = io.BytesIO()
-        pdf.output(pdf_bytes)
-        pdf_bytes.seek(0)
-
-        # Tampilkan tombol download menggunakan st.download_button
-        st.markdown("### Download Hasil Screening")
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            pdf = create_pdf(hasil, user_input, questions)
+            pdf.output(tmp.name)
+            
+            with open(tmp.name, "rb") as f:
+                st.download_button(
+                    "⬇️ Download PDF",
+                    data=f,
+                    file_name="Hasil_Screening.pdf",
+                    mime="application/pdf"
+                )
         
-        # Tombol download
-        st.download_button(
-            label="⬇️ Download Hasil Lengkap (PDF)",
-            data=pdf_bytes,
-            file_name=f"Hasil_Screening_{datetime.now().strftime('%Y%m%d')}.pdf",
-            mime="application/octet-stream",  # Lebih universal daripada application/pdf
-            key="pdf_download"  # Key unik untuk komponen
-        )
+        # Bersihkan file temporary
+        os.unlink(tmp.name)
 
     # Footer
     st.markdown("""

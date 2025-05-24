@@ -182,8 +182,9 @@ def screening():
         # Buat PDF
         pdf = create_pdf(hasil, user_input, questions)
 
-        # Versi deployment-safe
-        pdf_bytes = get_pdf_download_link(pdf)
+        pdf_bytes = io.BytesIO()
+        pdf.output(pdf_bytes)
+        pdf_bytes.seek(0)
 
         # Tampilkan tombol download menggunakan st.download_button
         st.markdown("### Download Hasil Screening")

@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 import pickle
 from fpdf import FPDF
-import base64
 from datetime import datetime
+import io
 
 # --- Load Model Secara Efisien menggunakan cache_resource ---
 @st.cache_resource
@@ -15,7 +15,7 @@ def load_model():
 # Panggil model
 model = load_model()
 
-# Fungsi untuk membuat PDF
+# Fungsi untuk membuat PDF (tetap sama)
 def create_pdf(hasil, answers, questions):
     pdf = FPDF()
     pdf.add_page()
@@ -85,24 +85,6 @@ def create_pdf(hasil, answers, questions):
     
     return pdf
 
-# Fungsi untuk generate link download PDF
-def get_pdf_download_link(pdf, filename):
-    import io
-    import base64
-
-    buffer = io.BytesIO()
-    pdf.output(buffer)
-    buffer.seek(0)  # Penting: Reset pointer ke awal buffer
-    pdf_bytes = buffer.read()
-    buffer.close()
-
-    # Encode ke base64 dan decode ke utf-8
-    b64 = base64.b64encode(pdf_bytes).decode('utf-8')
-
-    # Generate link download
-    href = f'<a href="data:application/pdf;base64,{b64}" download="{filename}" target="_blank">Download Hasil Screening (PDF)</a>'
-    return href
-
 def screening():
     # Antarmuka pengguna Streamlit
     st.title("Screening Penyakit Mental")
@@ -111,7 +93,7 @@ def screening():
     Silakan jawab pertanyaan-pertanyaan di bawah ini:
     """)
 
-    # Input pertanyaan ke user
+    # Input pertanyaan ke user (daftar pertanyaan tetap sama)
     questions = [
         ("Apakah Anda merasa cemas atau gugup?", "anxiety and nervousness"),
         ("Apakah Anda merasa tertekan?", "depression"),
@@ -150,11 +132,9 @@ def screening():
         answer = st.radio(question, ["Tidak", "Ya"], key=feature_name)
         user_input.append(1 if answer == "Ya" else 0)
 
-    # Nama kolom sesuai training
-    column_name = [feature_name for _, feature_name in questions]
-
     # Fungsi prediksi
     def prediksi(input_data):
+        column_name = [feature_name for _, feature_name in questions]
         input_df = pd.DataFrame([input_data], columns=column_name)
         prediction = model.predict(input_df)
         return prediction[0]
@@ -163,9 +143,9 @@ def screening():
     if st.button("Prediksi"):
         hasil = prediksi(user_input)
         
-        # Format hasil prediksi
+        # Format hasil prediksi (tetap sama)
         if hasil.lower() == "other":
-            hasil_display = f"""
+            hasil_display = """
             <div style="background-color:rgba(38, 39, 48, 0.8); border-radius:0.5rem; padding:1rem; margin:1rem 0; border-left:4px solid #9AD8E1;">
                 <h3 style="color:#9AD8E1; margin-top:0;">🟢 Hasil Screening</h3>
                 <p>Berdasarkan jawaban Anda:</p>
@@ -194,11 +174,21 @@ def screening():
         
         # Buat PDF
         pdf = create_pdf(hasil, user_input, questions)
+
+        pdf_bytes = io.BytesIO()
+        pdf.output(pdf_bytes)
+        pdf_bytes.seek(0)
         
-        # Tampilkan tombol download
+        # Tampilkan tombol download menggunakan st.download_button
         st.markdown("### Download Hasil Screening")
-        st.markdown(get_pdf_download_link(pdf, "Hasil_Screening.pdf"), 
-                    unsafe_allow_html=True)
+        
+        # Tombol download
+        st.download_button(
+            "📥 Download Hasil Screening (PDF)",
+            data=pdf_bytes,
+            file_name=f"Hasil_Screening_{datetime.now().strftime('%Y%m%d')}.pdf",
+            mime="application/pdf"
+        )
 
     # Footer
     st.markdown("""
@@ -208,6 +198,5 @@ def screening():
         </footer>
     """, unsafe_allow_html=True)
 
-# Untuk menjalankan
 if __name__ == "__main__":
     screening()

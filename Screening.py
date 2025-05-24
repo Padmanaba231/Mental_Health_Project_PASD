@@ -87,15 +87,14 @@ def create_pdf(hasil, answers, questions):
 
 # Fungsi untuk generate link download PDF
 def get_pdf_download_link(pdf, filename):
-    # Generate PDF output
-    import io
-    buffer = io.BytesIO()
-    pdf.output(buffer)
-    pdf_output = buffer.getvalue()
-
-    # Convert to base64
+    # Gunakan output dengan dest='S' untuk mengembalikan isi sebagai string
+    pdf_output = pdf.output(dest='S').encode('latin-1')
+    
+    # Convert ke base64
     b64 = base64.b64encode(pdf_output).decode('latin-1')
+    
     return f'<a href="data:application/pdf;base64,{b64}" download="{filename}">Download Hasil Screening (PDF)</a>'
+
 
 def screening():
     # Antarmuka pengguna Streamlit
